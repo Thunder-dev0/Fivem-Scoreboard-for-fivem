@@ -3,8 +3,7 @@ local isOpen = false
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        
-        -- ID 56 is the standard Control ID for F9
+    
         if IsControlJustPressed(0, 56) then
             if not isOpen then
                 print("F9 Pressed - Requesting data...")
@@ -37,7 +36,6 @@ RegisterNUICallback('close', function(data, cb)
     cb('ok')
 end)
 
--- 4. Keep your test command just in case
 RegisterCommand('testui', function()
     isOpen = true
     SetNuiFocus(true, true)
