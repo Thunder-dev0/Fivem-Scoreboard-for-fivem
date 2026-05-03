@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container" style="display: none;">
+        <div id="scoreboard-wrapper">
+            <div id="scoreboard-header">
+                <span>SERVER PLAYERS</span>
+                <div class="scale-box">
+                    <label>SCALE</label>
+                    <input type="range" id="scaler" min="0.5" max="1.2" step="0.05" value="1">
+                </div>
+            </div>
+
+            <table id="scoreboard">
+                <thead>
+                    <tr>
+                        <th class="col-id">ID</th>
+                        <th class="col-name">NAME</th>
+                    </tr>
+                </thead>
+                <tbody id="player-list">
+                    </tbody>
+            </table>
+
+            <div id="scoreboard-footer">
+                MADE BY THUNDER
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const list = document.getElementById('player-list');
+        const wrapper = document.getElementById('scoreboard-wrapper');
+        const header = document.getElementById('scoreboard-header');
+
+        // --- Dragging Logic ---
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'INPUT') return; // Don't drag if adjusting slider
+            isDragging = true;
+            offset.x = e.clientX - wrapper.offsetLeft;
+            offset.y = e.clientY - wrapper.offsetTop;
+            header.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                wrapper.style.position = 'absolute';
+                wrapper.style.margin = '0';
+                wrapper.style.left = (e.clientX - offset.x) + 'px';
+                wrapper.style.top = (e.clientY - offset.y) + 'px';
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            header.style.cursor = 'grab';
+        });
+
+        // --- NUI Communication ---
+        window.addEventListener('message', (event) => {
+            if (event.data.action === "open") {
+                container.style.display = 'flex';
+                list.innerHTML = '';
+                event.data.players.forEach(player => {
+                    list.innerHTML += `
+                        <tr>
+                            <td class="id-cell">${player.id}</td>
+                            <td class="name-cell">${player.name}</td>
+                        </tr>`;
+                });
+            }
+        });
+
+        // --- Controls ---
+        document.getElementById('scaler').addEventListener('input', (e) => {
+            wrapper.style.transform = `scale(${e.target.value})`;
+        });
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                container.style.display = 'none';
+                fetch(`https://${GetParentResourceName()}/close`, { method: 'POST' });
+            }
+        });
+    </script>
+</body>
+</html>
