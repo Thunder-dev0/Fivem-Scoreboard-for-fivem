@@ -1,7 +1,5 @@
 local isOpen = false
 
--- 1. Direct Key Check (Thread)
--- This bypasses the Key Mapping system and checks for the raw key press.
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
